@@ -76,6 +76,19 @@
             // player
             const player = makePlayer()
 
+            // input
+            const deviceSourceManager = new BABYLON.DeviceSourceManager(scene.getEngine())
+            // If the device has been registered in the DeviceSourceManager
+            if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard)) {
+                // And the A button was pressed
+                if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard).getInput(BABYLON.XboxInput.A /* change this */) == 1) {
+                    // Do something
+                }
+            }
+            // i need to find the input keys for W A S D
+            // https://doc.babylonjs.com/divingDeeper/input/deviceSourceManager
+            // api https://doc.babylonjs.com/typedoc
+
             // ground 
             const ground = makeGround()
             
@@ -151,6 +164,7 @@
             return ground
         }
 
+       
     </script>
 </body>
 </html>
