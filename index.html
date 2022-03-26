@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-        <title>Babylon.js sample code</title>
+        <title>Lab 7</title>
 
         <!-- Babylon.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
@@ -60,6 +60,10 @@
         var createScene = function() {
             var scene = new BABYLON.Scene(engine);
 
+            // physics
+            scene.enablePhysics()
+            //scene.gravity = new BABYLON.Vector3(0, -10, 0)
+
             var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero(), scene);
             //var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
 
@@ -67,11 +71,9 @@
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
 
             // player -sphere
-            const player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
-            let playerMaterial = new BABYLON.StandardMaterial(scene)
-            playerMaterial.alpha = 1
-            playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
-            player.material = playerMaterial
+            const player = makePlayer()
+
+            // player physics
 
             // ground 
             var ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene);
@@ -83,16 +85,6 @@
             // This attaches the camera to the canvas
             camera.attachControl(canvas, true);
 
-            // Physics --------------------------------------------------------------
-            //scene.enablePhysics(null, new BABYLON.CannonJSPlugin());
-            //scene.enablePhysics(null, new BABYLON.OimoJSPlugin());
-            scene.enablePhysics(null, new BABYLON.AmmoJSPlugin());
-            var physicsEngine = scene.getPhysicsEngine();
-
-            // Add Imposters
-            player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 2, friction: 0.0, restitution: 0.3 }, scene);
-            ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.0, restitution: 0.7 }, scene);
-            // Physics --------------------------------------------------------------
 
             return scene;
         };
@@ -100,22 +92,40 @@
         window.initFunction = async function() {           
             var asyncEngineCreation = async function() {
                 try {
-                    return createDefaultEngine();
+                    return createDefaultEngine()
                 } catch(e) {
-                    console.log("the available createEngine function failed. Creating the default engine instead");
-                    return createDefaultEngine();
+                    console.log("the available createEngine function failed. Creating the default engine instead")
+                    return createDefaultEngine()
                 }
             }
-            window.engine = await asyncEngineCreation();
-            if (!engine) throw 'engine should not be null.';
-            startRenderLoop(engine, canvas);
-            window.scene = createScene();};
-            initFunction().then(() => {sceneToRender = scene                    
-        });
+            window.engine = await asyncEngineCreation()
+            if (!engine) {
+                throw 'engine should not be null.'
+            }
+            startRenderLoop(engine, canvas)
+            window.scene = createScene()
+        }
+            
+        initFunction().then(() => {
+            sceneToRender = scene                    
+        })
+
         // Resize
         window.addEventListener("resize", function () {
-            engine.resize();
-        });
+            engine.resize()
+        })
+
+        // make the player
+        function makePlayer() {
+            const player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
+            // material
+            let playerMaterial = new BABYLON.StandardMaterial(scene)
+            playerMaterial.alpha = 1
+            playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
+            player.material = playerMaterial
+            return player
+        }
+
     </script>
 </body>
 </html>
