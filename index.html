@@ -3,7 +3,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 
-        <title>Lab 7</title>
+        <title>Cordell Bonnieux's Lab 7</title>
 
         <!-- Babylon.js -->
         <script src="https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.6.2/dat.gui.min.js"></script>
@@ -40,19 +40,22 @@
 <body>
     <canvas id="renderCanvas"></canvas>
     <script>
-        var canvas = document.getElementById("renderCanvas");
+        var canvas = document.getElementById("renderCanvas")
         var startRenderLoop = function (engine, canvas) {
             engine.runRenderLoop(function () {
                 if (sceneToRender && sceneToRender.activeCamera) {
-                    sceneToRender.render();
+                    sceneToRender.render()
                 }
-            });
+            })
         }
 
-        var engine = null;
-        var scene = null;
-        var sceneToRender = null;
-        var createDefaultEngine = function() { return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); };
+        var engine = null
+        var scene = null
+        var sceneToRender = null
+        var createDefaultEngine = function() { 
+            return new BABYLON.Engine(canvas, true, { preserveDrawingBuffer: true, stencil: true,  disableWebGL2Support: false}); 
+        }
+
         // You have to create a function called createScene. This function must return a BABYLON.Scene object
         // You can reference the following variables: engine, canvas
         // You must at least define a camera
@@ -64,26 +67,23 @@
             scene.enablePhysics()
             //scene.gravity = new BABYLON.Vector3(0, -10, 0)
 
-            var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero(), scene);
+            var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero(), scene)
             //var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
 
             // light from top
-            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene);
+            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene)
 
-            // player -sphere
+            // player
             const player = makePlayer()
 
-            // player physics
-
             // ground 
-            var ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene);
-            ground.position.y = -5.0;
+            const ground = makeGround()
             
             // This targets the camera to player
-            camera.setTarget(player);
+            camera.setTarget(player)
 
             // This attaches the camera to the canvas
-            camera.attachControl(canvas, true);
+            camera.attachControl(canvas, true)
 
 
             return scene;
@@ -118,12 +118,37 @@
         // make the player
         function makePlayer() {
             const player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
+
             // material
             let playerMaterial = new BABYLON.StandardMaterial(scene)
             playerMaterial.alpha = 1
             playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
+            playerMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             player.material = playerMaterial
+
+            // gravity
+            player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 2, friction: 0.0, restitution: 0.3 }, scene);
             return player
+        }
+
+        // make the ground so player does not fall through the floor!
+        function makeGround() {
+            // create ground and set y pos
+            const ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene);
+            ground.position.y = -5.0;
+
+            // no gravity for ground
+            ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.0, restitution: 0.7 }, scene);
+
+            // ground material and shadows
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
+            groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.9, 0.3);
+            groundMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
+            groundMat.backFaceCulling = false;
+            ground.material = groundMat;
+            ground.receiveShadows = true;
+
+            return ground
         }
 
     </script>
