@@ -154,15 +154,25 @@
                 if (!scene.isReady()) {
                     return
                 }
-
                 text.text = `key pressed: `
-                // this is looping with delta time
+                if (player.intersectsMesh(ground, true)) {
+                    //console.log('touching ground')
+                    player.grounded = true
+                }
+                
+
+                if (controls.w && player.grounded) {
+                    player.grounded = false
+                    player.moveWithCollisions(new BABYLON.Vector3(0, 5, 0))
+                    //player.moveWithCollisions(new BABYLON.Vector3(0, -0.3, 0))
+                    text.text = `key pressed: w`
+                }
                 if (controls.a) {
-                    player.moveWithCollisions(new BABYLON.Vector3(-0.1, 0, 0))
+                    player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
                     text.text = `key pressed: a`
                 }
                 if (controls.d) {
-                    player.moveWithCollisions(new BABYLON.Vector3(0.1, 0, 0))
+                    player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                     text.text = `key pressed: d`
                 }
 
@@ -208,8 +218,10 @@
             playerMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             player.material = playerMaterial
 
+            player.grounded = true
+
             // gravity
-            player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 2, friction: 0.0, restitution: 0.3 }, scene);
+            player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, friction: 0.0, restitution: 0.3 }, scene);
             return player
         }
 
