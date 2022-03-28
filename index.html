@@ -76,19 +76,6 @@
             // player
             const player = makePlayer()
 
-            // input
-            const deviceSourceManager = new BABYLON.DeviceSourceManager(scene.getEngine())
-            // If the device has been registered in the DeviceSourceManager
-            if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard)) {
-                // And the A button was pressed
-                if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard).getInput(BABYLON.XboxInput.A /* change this */) == 1) {
-                    // Do something
-                }
-            }
-            // i need to find the input keys for W A S D
-            // https://doc.babylonjs.com/divingDeeper/input/deviceSourceManager
-            // api https://doc.babylonjs.com/typedoc
-
             // ground 
             const ground = makeGround()
             
@@ -97,6 +84,63 @@
 
             // This attaches the camera to the canvas
             camera.attachControl(canvas, true)
+
+            // ui text
+            const ui = BABYLON.GUI.AdvancedDynamicTexture.CreateFullscreenUI('UI')
+            let text = new BABYLON.GUI.TextBlock()
+            text.text = 'hello'
+            text.color = 'white'
+            text.textVerticalAlignment = BABYLON.GUI.Control.VERTICAL_ALIGNMENT_TOP
+            text.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
+            ui.addControl(text)
+
+            /*
+            // input
+            const deviceSourceManager = new BABYLON.DeviceSourceManager(scene.getEngine())
+
+            // If the device has been registered in the DeviceSourceManager
+            if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard)) {
+                // And the A button was pressed
+                if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard).getInput('space') == 1) {
+                    text.text = 'you pressed W'
+                    console.log('w')
+                }
+            }
+            // i need to find the input keys for W A S D
+            // https://doc.babylonjs.com/divingDeeper/input/deviceSourceManager
+            // api https://doc.babylonjs.com/typedoc
+            */
+
+            // input listeners
+            let b = {
+                w: false,
+                a: false,
+                s: false,
+                d: false
+            }
+
+            document.addEventListener('keydown', (e) => {
+                if (e.keyCode == 87) {
+                    console.log('jump!')
+                    b.w = true
+                    //player.imposter.applyImpulse(new BABYLON.Vector3(0, 5, 0).scale(5), player.getAbsolutePosition().add(BABYLON.Vector3.Zero()))
+                }
+
+                
+            })
+
+            scene.registerBeforeRender(() => {
+                if (!scene.isReady()) {
+                    return
+                }
+                // this is looping with delta time
+                if (b.w) {
+                    player.imposter.applyImpulse(new BABYLON.Vector3(0, 5, 0).scale(5), player.getAbsolutePosition().add(BABYLON.Vector3.Zero()))
+                }
+
+            })
+
+
 
 
             return scene;
@@ -140,7 +184,7 @@
             player.material = playerMaterial
 
             // gravity
-            player.physicsImpostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 2, friction: 0.0, restitution: 0.3 }, scene);
+            player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 2, friction: 0.0, restitution: 0.3 }, scene);
             return player
         }
 
@@ -162,9 +206,7 @@
             ground.receiveShadows = true;
 
             return ground
-        }
-
-       
+        }  
     </script>
 </body>
 </html>
