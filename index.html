@@ -112,7 +112,7 @@
             */
 
             // input listeners
-            let b = {
+            let controls = {
                 w: false,
                 a: false,
                 s: false,
@@ -121,27 +121,52 @@
 
             document.addEventListener('keydown', (e) => {
                 if (e.keyCode == 87) {
-                    console.log('jump!')
-                    b.w = true
-                    //player.imposter.applyImpulse(new BABYLON.Vector3(0, 5, 0).scale(5), player.getAbsolutePosition().add(BABYLON.Vector3.Zero()))
+                    controls.w = true
                 }
-
-                
+                if (e.keyCode == 65) {
+                    controls.a = true
+                }
+                if (e.keyCode == 83) {
+                    controls.s = true
+                }
+                if (e.keyCode == 68) {
+                    controls.d = true
+                }                
             })
 
+            document.addEventListener('keyup', (e) => {
+                if (e.keyCode == 87) {
+                    controls.w = false
+                }
+                if (e.keyCode == 65) {
+                    controls.a = false
+                }
+                if (e.keyCode == 83) {
+                    controls.s = false
+                }
+                if (e.keyCode == 68) {
+                    controls.d = false
+                }                
+            })
+
+            // preload
             scene.registerBeforeRender(() => {
                 if (!scene.isReady()) {
                     return
                 }
+
+                text.text = `key pressed: `
                 // this is looping with delta time
-                if (b.w) {
-                    player.imposter.applyImpulse(new BABYLON.Vector3(0, 5, 0).scale(5), player.getAbsolutePosition().add(BABYLON.Vector3.Zero()))
+                if (controls.a) {
+                    player.moveWithCollisions(new BABYLON.Vector3(-0.1, 0, 0))
+                    text.text = `key pressed: a`
+                }
+                if (controls.d) {
+                    player.moveWithCollisions(new BABYLON.Vector3(0.1, 0, 0))
+                    text.text = `key pressed: d`
                 }
 
             })
-
-
-
 
             return scene;
         };
