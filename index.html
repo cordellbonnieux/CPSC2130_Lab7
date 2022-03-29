@@ -148,7 +148,14 @@
                     //player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
                     player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                 }
-
+                if (controls.w) {
+                    // move forward
+                    player.moveWithCollisions(new BABYLON.Vector3(0, 0, 1))
+                }
+                if (controls.s) {
+                    // move backward
+                    player.moveWithCollisions(new BABYLON.Vector3(0, 0, -1))
+                }
             })
 
             return scene;
@@ -333,29 +340,6 @@
             }
             */
         }
-
-
-
-        function checkCollisions(player) {
-            let directions = {
-                forward: true,
-                right: true,
-                left: true,
-                backward: true
-            }
-            if (player.position.x > 45) {
-                directions.right = false
-                const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
-                player.impostor.applyImpulse(new BABYLON.Vector3(-8, 0, 0), left)
-            }
-            if (player.position.x < -45) {
-                directions.left = false
-                const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
-                player.impostor.applyImpulse(new BABYLON.Vector3(8, 0, 0), right)
-            }
-            return directions
-        }
-
     </script>
 </body>
 </html>
