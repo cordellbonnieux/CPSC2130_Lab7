@@ -120,21 +120,28 @@
             }
 
             document.addEventListener('keydown', (e) => {
+                let key
                 if (e.keyCode == 87) {
                     controls.w = true
+                    key = 'w'
                 }
                 if (e.keyCode == 65) {
                     controls.a = true
+                    key = 'a'
                 }
                 if (e.keyCode == 83) {
                     controls.s = true
+                    key = 's'
                 }
                 if (e.keyCode == 68) {
                     controls.d = true
-                }                
+                    key = 'd'
+                }
+                text.text = `key pressed: ${key}`
             })
 
             document.addEventListener('keyup', (e) => {
+                text.text = `key pressed: `
                 if (e.keyCode == 87) {
                     controls.w = false
                 }
@@ -154,26 +161,32 @@
                 if (!scene.isReady()) {
                     return
                 }
-                text.text = `key pressed: `
+
                 if (player.intersectsMesh(ground, true)) {
-                    //console.log('touching ground')
+                    // player is on the ground
                     player.grounded = true
                 }
                 
+                ground.x = player.x
 
                 if (controls.w && player.grounded) {
+                    // jump
                     player.grounded = false
-                    player.moveWithCollisions(new BABYLON.Vector3(0, 5, 0))
-                    //player.moveWithCollisions(new BABYLON.Vector3(0, -0.3, 0))
-                    text.text = `key pressed: w`
+                    console.log(player)
+                    const pos = new BABYLON.Vector3(player.position._x, player.position._y + 1, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 100, 0), pos)
                 }
                 if (controls.a) {
+                    // move left
                     player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
-                    text.text = `key pressed: a`
+                    // is this working?
+                    player.rotation = new BABYLON.Vector3(0, -45, 0)
                 }
                 if (controls.d) {
+                    // move right
                     player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
-                    text.text = `key pressed: d`
+                    // is this working?
+                    player.rotation = new BABYLON.Vector3(0, 45, 0)
                 }
 
             })
@@ -209,7 +222,7 @@
 
         // make the player
         function makePlayer() {
-            const player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
+            let player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
 
             // material
             let playerMaterial = new BABYLON.StandardMaterial(scene)
