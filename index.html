@@ -79,8 +79,17 @@
             camera.checkCollisions = true
 
             // light from top
-            const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(50, 25, 25))
-            const light2 = new BABYLON.HemisphericLight('light2', new BABYLON.Vector3(-50, 25, -25))
+            const light = new BABYLON.DirectionalLight('light', new BABYLON.Vector3(10, -45, 10))
+            light.diffuse = new BABYLON.Color3(0.33333, 0.420, 0.69)
+            light.specular = new BABYLON.Color3(0.33333, 0.420, 0.69)
+            light.intensity = 3
+            light.range = 100
+            // light 2
+            const light2 = new BABYLON.DirectionalLight('light', new BABYLON.Vector3(-10, 45, -10))
+            light2.diffuse = new BABYLON.Color3(0.33333, 0.420, 0.69)
+            light2.specular = new BABYLON.Color3(0.33333, 0.420, 0.69)
+            light2.intensity = 3
+            light2.range = 100
 
             // add gravity
             scene.gravity = new BABYLON.Vector3(0, -9.81, 0)
@@ -255,13 +264,11 @@
         // make the player
         function makePlayer() {
             let player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
-
             // material
             let playerMaterial = new BABYLON.StandardMaterial(scene)
             playerMaterial.alpha = 0.8
             playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
             player.material = playerMaterial
-
             player.checkCollisions = true
             player.grounded = true
 
@@ -275,10 +282,8 @@
             // create ground and set y pos
             const ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene)
             ground.position.y = -5.0
-
             // no gravity for ground
             ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.0, restitution: 0.7 }, scene)
-
             // ground material and shadows
             const groundMat = new BABYLON.StandardMaterial("groundMat", scene)
             groundMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
@@ -294,14 +299,12 @@
             let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2})
             box.position._x = (box.position._x * i) + 5
             box.position._z = (box.position._z * i) + 5
-
             // material
             let material = new BABYLON.StandardMaterial(scene)
             material.alpha = 1
             material.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
             material.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
             box.material = material
-
             // gravity
             box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 })
             return box
@@ -311,7 +314,7 @@
             let walls = []
             for (let i = 0; i < 4; i++) {
                 // constructor
-                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 50, depth: 10, subdivsions: 1})
+                let wall = BABYLON.MeshBuilder.CreateBox(`wall${i}`, {width: 100, height: 50, depth: 5, subdivsions: 1})
                 // collisions
                 wall.checkCollisions = true
                 // material
@@ -319,7 +322,7 @@
                 wall.material.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
                 wall.material.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
                 // positioning
-                wall.position.y = 2
+                wall.position.y = 20
                 switch (i) {
                     case 0: wall.position.z = 50
                         break
