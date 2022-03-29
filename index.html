@@ -85,7 +85,7 @@
             //scene.gravity = new BABYLON.Vector3(0, -10, 0)
 
             // camera - edit
-            let camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero())
+            let camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, new BABYLON.Vector3(0, 3, -3))
             camera.checkCollisions = true
 
             // light
@@ -163,23 +163,27 @@
                 }
                 if (controls.a) { 
                     // move left
-                    //const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
-                    //player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
-                    player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
+                    const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
+                    //player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
                 }
                 if (controls.d) {
                     // move right
-                    //const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
-                    //player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
-                    player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
+                    const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
+                    //player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                 }
                 if (controls.w) {
                     // move forward
-                    player.moveWithCollisions(new BABYLON.Vector3(0, 0, 1))
+                    //player.moveWithCollisions(new BABYLON.Vector3(0, 0, 1))
+                    const forward = new BABYLON.Vector3(player.position._x, player.position._y, player.position._z - 1)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, 1), forward)
                 }
                 if (controls.s) {
                     // move backward
-                    player.moveWithCollisions(new BABYLON.Vector3(0, 0, -1))
+                    //player.moveWithCollisions(new BABYLON.Vector3(0, 0, -1))
+                    const forward = new BABYLON.Vector3(player.position._x, player.position._y, player.position._z + 1)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, -1), forward)
                 }
             })
 
@@ -362,11 +366,6 @@
                 p.position.y = 0
                 p.position.z = 0
             }
-            /*
-            if (p.imposter.checkCollisions) {
-                console.log('collision detected')
-            }
-            */
         }
     </script>
 </body>
