@@ -67,11 +67,14 @@
             scene.enablePhysics()
             //scene.gravity = new BABYLON.Vector3(0, -10, 0)
 
+            // camera - edit
             var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero(), scene)
-            //var camera = new BABYLON.FreeCamera("camera1", new BABYLON.Vector3(0, 5, -10), scene);
 
             // light from top
             const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene)
+
+            // add gravity
+            scene.gravity = new BABYLON.Vector3(0, -9.81, 0)
 
             // player
             const player = makePlayer()
@@ -175,7 +178,7 @@
                     player.grounded = true
                 }
                 
-                //ground.x = player.x
+                isPlayerInside(player)
 
                 if (controls.space && player.grounded) {
                     // jump
@@ -185,21 +188,15 @@
                 }
                 if (controls.a) { 
                     // move left
-                    //player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
-                    // is this working?
-                    //player.rotation = new BABYLON.Vector3(0, -45, 0)
-
-                    const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
+                    //const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
+                    //player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
+                    player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
                 }
                 if (controls.d) {
                     // move right
-                   // player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
-                    // is this working?
-                    //player.rotation = new BABYLON.Vector3(0, 45, 0)
-
-                    const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
+                    //const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
+                    //player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
+                    player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                 }
 
             })
@@ -243,6 +240,7 @@
             playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
             player.material = playerMaterial
 
+            player.checkCollisions = true
             player.grounded = true
 
             // gravity
@@ -261,8 +259,8 @@
 
             // ground material and shadows
             const groundMat = new BABYLON.StandardMaterial("groundMat", scene)
-            groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.9, 0.3)
-            groundMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+            groundMat.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
+            groundMat.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
             groundMat.backFaceCulling = false
             ground.material = groundMat
             ground.receiveShadows = true
@@ -278,7 +276,8 @@
             // material
             let material = new BABYLON.StandardMaterial(scene)
             material.alpha = 1
-            material.emissiveColor = new BABYLON.Color3(0.9, 0.3, 0.6)
+            material.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
+            material.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
             box.material = material
 
             // gravity
@@ -288,41 +287,64 @@
 
         function makeWalls() {
             let walls = []
-            for (let i = 0; i < 2; i++) {
+            for (let i = 0; i < 4; i++) {
                 // constructor
-                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 5, depth: 10, subdivsions: 1})
+                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 15, depth: 10, subdivsions: 1})
                 // collisions
                 wall.checkCollisions = true
                 // material
                 wall.material = new BABYLON.StandardMaterial(`wall${i}`)
-                wall.material.emissiveColor = new BABYLON.Color3(0.3, 1, 0.8)
+                wall.material.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
+                wall.material.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
                 // positioning
-                //wall.position.y = -2
+                wall.position.y = -2
                 switch (i) {
                     case 0: wall.position.z = 50
                         break
-                    case 1: wall.position.z = -6
+                    case 1: wall.position.x = 50
+                        wall.addRotation(0, Math.PI/2, 0)
                         break
-                    /*
-                        // these two need to be rotated
-                    case 2: wall.position.z = 100
+                    case 2: wall.position.z = -50
                         break 
-                    case 3: wall.position.z = - 100 
-                    */
+                    case 3: wall.position.x = -50
+                        wall.addRotation(0, Math.PI/2, 0)
                 }
+                // return the array containing the walls
                 walls.push(wall)
-            } 
-            /*
-            let wallNorth=BABYLON.MeshBuilder.CreatePlane("wallNorth", {width: 16, height: 2.7, subdivsions: 1}, scene);
-            wallNorth.position.y=1.35;
-            wallNorth.position.x=0;
-            wallNorth.position.z=-8;
-            wallNorth.addRotation(0, Math.PI, 0);
-            wallNorth.material=wall_mat;
-            wallNorth.checkCollisions=true;
-            */
+            }
            return walls
         }
+
+        function isPlayerInside(p) {
+            if (p.position.x > 50 || p.position.x < -50 || p.position.z > 50 || p.position.z < -50) {
+                p.position.x = 0
+                p.position.y = 0
+                p.position.z = 0
+            }
+        }
+
+
+
+        function checkCollisions(player) {
+            let directions = {
+                forward: true,
+                right: true,
+                left: true,
+                backward: true
+            }
+            if (player.position.x > 45) {
+                directions.right = false
+                const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
+                player.impostor.applyImpulse(new BABYLON.Vector3(-8, 0, 0), left)
+            }
+            if (player.position.x < -45) {
+                directions.left = false
+                const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
+                player.impostor.applyImpulse(new BABYLON.Vector3(8, 0, 0), right)
+            }
+            return directions
+        }
+
     </script>
 </body>
 </html>
