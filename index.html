@@ -78,7 +78,23 @@
 
             // ground 
             const ground = makeGround()
-            
+
+            // walls
+            const walls = makeWalls()
+
+            // boxes
+            const box = makeBox(1)
+            /*
+
+            something's wrong here
+
+            let boxes = []
+            let num = 25
+            for (let i = 0; i < num; i++) {
+                boxes.push(makeBox(i))
+            }
+            */
+
             // This targets the camera to player
             camera.setTarget(player)
 
@@ -94,22 +110,6 @@
             text.textHorizontalAlignment = BABYLON.GUI.Control.HORIZONTAL_ALIGNMENT_LEFT
             ui.addControl(text)
 
-            /*
-            // input
-            const deviceSourceManager = new BABYLON.DeviceSourceManager(scene.getEngine())
-
-            // If the device has been registered in the DeviceSourceManager
-            if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard)) {
-                // And the A button was pressed
-                if (deviceSourceManager.getDeviceSource(BABYLON.DeviceType.Keyboard).getInput('space') == 1) {
-                    text.text = 'you pressed W'
-                    console.log('w')
-                }
-            }
-            // i need to find the input keys for W A S D
-            // https://doc.babylonjs.com/divingDeeper/input/deviceSourceManager
-            // api https://doc.babylonjs.com/typedoc
-            */
 
             // input listeners
             let controls = {
@@ -120,7 +120,7 @@
             }
 
             document.addEventListener('keydown', (e) => {
-                let key
+                let key = null
                 if (e.keyCode == 87) {
                     controls.w = true
                     key = 'w'
@@ -137,6 +137,11 @@
                     controls.d = true
                     key = 'd'
                 }
+                if (e.keyCode == 32) {
+                    controls.space = true
+                    key = 'space'
+                }
+                key = key == null ? 'unassigned key' : key
                 text.text = `key pressed: ${key}`
             })
 
@@ -153,7 +158,10 @@
                 }
                 if (e.keyCode == 68) {
                     controls.d = false
-                }                
+                }
+                if (e.keyCode == 32) {
+                    controls.space = false
+                }           
             })
 
             // preload
@@ -167,26 +175,31 @@
                     player.grounded = true
                 }
                 
-                ground.x = player.x
+                //ground.x = player.x
 
-                if (controls.w && player.grounded) {
+                if (controls.space && player.grounded) {
                     // jump
                     player.grounded = false
-                    console.log(player)
-                    const pos = new BABYLON.Vector3(player.position._x, player.position._y + 1, player.position._z)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 100, 0), pos)
+                    const up = new BABYLON.Vector3(player.position._x, player.position._y + 1, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 100, 0), up)
                 }
-                if (controls.a) {
+                if (controls.a) { 
                     // move left
-                    player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
+                    //player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
                     // is this working?
-                    player.rotation = new BABYLON.Vector3(0, -45, 0)
+                    //player.rotation = new BABYLON.Vector3(0, -45, 0)
+
+                    const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
                 }
                 if (controls.d) {
                     // move right
-                    player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
+                   // player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                     // is this working?
-                    player.rotation = new BABYLON.Vector3(0, 45, 0)
+                    //player.rotation = new BABYLON.Vector3(0, 45, 0)
+
+                    const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
                 }
 
             })
@@ -226,9 +239,8 @@
 
             // material
             let playerMaterial = new BABYLON.StandardMaterial(scene)
-            playerMaterial.alpha = 1
+            playerMaterial.alpha = 0.8
             playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
-            playerMaterial.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
             player.material = playerMaterial
 
             player.grounded = true
@@ -241,22 +253,76 @@
         // make the ground so player does not fall through the floor!
         function makeGround() {
             // create ground and set y pos
-            const ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene);
-            ground.position.y = -5.0;
+            const ground = BABYLON.MeshBuilder.CreateBox("Ground", {width: 100, height: 1, depth: 100}, scene)
+            ground.position.y = -5.0
 
             // no gravity for ground
-            ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.0, restitution: 0.7 }, scene);
+            ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 0, friction: 0.0, restitution: 0.7 }, scene)
 
             // ground material and shadows
-            const groundMat = new BABYLON.StandardMaterial("groundMat", scene);
-            groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.9, 0.3);
-            groundMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2);
-            groundMat.backFaceCulling = false;
-            ground.material = groundMat;
-            ground.receiveShadows = true;
+            const groundMat = new BABYLON.StandardMaterial("groundMat", scene)
+            groundMat.diffuseColor = new BABYLON.Color3(0.3, 0.9, 0.3)
+            groundMat.emissiveColor = new BABYLON.Color3(0.2, 0.2, 0.2)
+            groundMat.backFaceCulling = false
+            ground.material = groundMat
+            ground.receiveShadows = true
 
             return ground
         }  
+
+        function makeBox(i) {
+            let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2}, scene)
+            box.position._x = (box.position._x * i) + 5
+            box.position._z = (box.position._z * i) + 5
+
+            // material
+            let material = new BABYLON.StandardMaterial(scene)
+            material.alpha = 1
+            material.emissiveColor = new BABYLON.Color3(0.9, 0.3, 0.6)
+            box.material = material
+
+            // gravity
+            box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 }, scene)
+            return box
+        }
+
+        function makeWalls() {
+            let walls = []
+            for (let i = 0; i < 2; i++) {
+                // constructor
+                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 5, depth: 10, subdivsions: 1})
+                // collisions
+                wall.checkCollisions = true
+                // material
+                wall.material = new BABYLON.StandardMaterial(`wall${i}`)
+                wall.material.emissiveColor = new BABYLON.Color3(0.3, 1, 0.8)
+                // positioning
+                //wall.position.y = -2
+                switch (i) {
+                    case 0: wall.position.z = 50
+                        break
+                    case 1: wall.position.z = -6
+                        break
+                    /*
+                        // these two need to be rotated
+                    case 2: wall.position.z = 100
+                        break 
+                    case 3: wall.position.z = - 100 
+                    */
+                }
+                walls.push(wall)
+            } 
+            /*
+            let wallNorth=BABYLON.MeshBuilder.CreatePlane("wallNorth", {width: 16, height: 2.7, subdivsions: 1}, scene);
+            wallNorth.position.y=1.35;
+            wallNorth.position.x=0;
+            wallNorth.position.z=-8;
+            wallNorth.addRotation(0, Math.PI, 0);
+            wallNorth.material=wall_mat;
+            wallNorth.checkCollisions=true;
+            */
+           return walls
+        }
     </script>
 </body>
 </html>
