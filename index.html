@@ -115,57 +115,7 @@
 
 
             // input listeners
-            let controls = {
-                w: false,
-                a: false,
-                s: false,
-                d: false
-            }
-
-            document.addEventListener('keydown', (e) => {
-                let key = null
-                if (e.keyCode == 87) {
-                    controls.w = true
-                    key = 'w'
-                }
-                if (e.keyCode == 65) {
-                    controls.a = true
-                    key = 'a'
-                }
-                if (e.keyCode == 83) {
-                    controls.s = true
-                    key = 's'
-                }
-                if (e.keyCode == 68) {
-                    controls.d = true
-                    key = 'd'
-                }
-                if (e.keyCode == 32) {
-                    controls.space = true
-                    key = 'space'
-                }
-                key = key == null ? 'unassigned key' : key
-                text.text = `key pressed: ${key}`
-            })
-
-            document.addEventListener('keyup', (e) => {
-                text.text = `key pressed: `
-                if (e.keyCode == 87) {
-                    controls.w = false
-                }
-                if (e.keyCode == 65) {
-                    controls.a = false
-                }
-                if (e.keyCode == 83) {
-                    controls.s = false
-                }
-                if (e.keyCode == 68) {
-                    controls.d = false
-                }
-                if (e.keyCode == 32) {
-                    controls.space = false
-                }           
-            })
+            const controls = addControls(text)
 
             // preload
             scene.registerBeforeRender(() => {
@@ -229,6 +179,62 @@
         window.addEventListener("resize", function () {
             engine.resize()
         })
+
+        // inputs 
+        function addControls(text) {
+            let controls = {
+                w: false,
+                a: false,
+                s: false,
+                d: false
+            }
+
+            document.addEventListener('keydown', (e) => {
+                let key = null
+                if (e.keyCode == 87) {
+                    controls.w = true
+                    key = 'w'
+                }
+                if (e.keyCode == 65) {
+                    controls.a = true
+                    key = 'a'
+                }
+                if (e.keyCode == 83) {
+                    controls.s = true
+                    key = 's'
+                }
+                if (e.keyCode == 68) {
+                    controls.d = true
+                    key = 'd'
+                }
+                if (e.keyCode == 32) {
+                    controls.space = true
+                    key = 'space'
+                }
+                key = key == null ? 'unassigned key' : key
+                text.text = `key pressed: ${key}`
+            })
+
+            document.addEventListener('keyup', (e) => {
+                text.text = `key pressed: `
+                if (e.keyCode == 87) {
+                    controls.w = false
+                }
+                if (e.keyCode == 65) {
+                    controls.a = false
+                }
+                if (e.keyCode == 83) {
+                    controls.s = false
+                }
+                if (e.keyCode == 68) {
+                    controls.d = false
+                }
+                if (e.keyCode == 32) {
+                    controls.space = false
+                }           
+            })
+            return controls
+        }
 
         // make the player
         function makePlayer() {
@@ -321,6 +327,11 @@
                 p.position.y = 0
                 p.position.z = 0
             }
+            /*
+            if (p.imposter.checkCollisions) {
+                console.log('collision detected')
+            }
+            */
         }
 
 
