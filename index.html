@@ -273,8 +273,10 @@
             player.checkCollisions = true
             player.grounded = true
 
+            player.material.diffuseTexture = new BABYLON.Texture('img/player-texture.jpg')
+
             // gravity
-            player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, friction: 0.0, restitution: 0.3 }, scene);
+            player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, friction: 0.5, restitution: 0.3 }, scene);
             return player
         }
 
@@ -292,6 +294,7 @@
             groundMat.backFaceCulling = false
             ground.material = groundMat
             ground.receiveShadows = true
+            ground.material.diffuseTexture = new BABYLON.Texture('img/ground-texture.jpg')
 
             return ground
         }  
