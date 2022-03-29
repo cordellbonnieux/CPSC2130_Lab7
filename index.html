@@ -1,4 +1,11 @@
 <!DOCTYPE html>
+<!--
+    Student: Cordell Bonnieux
+    ID: 100372192
+    Instructor: Anu Gupta
+    Section: M01
+    Lab: 7
+-->
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -68,10 +75,12 @@
             //scene.gravity = new BABYLON.Vector3(0, -10, 0)
 
             // camera - edit
-            var camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero(), scene)
+            let camera = new BABYLON.ArcRotateCamera("Camera", -Math.PI / 2, Math.PI / 2, 12, BABYLON.Vector3.Zero())
+            camera.checkCollisions = true
 
             // light from top
-            const light = new BABYLON.HemisphericLight("light", new BABYLON.Vector3(0, 1, 0), scene)
+            const light = new BABYLON.HemisphericLight('light', new BABYLON.Vector3(50, 25, 25))
+            const light2 = new BABYLON.HemisphericLight('light2', new BABYLON.Vector3(-50, 25, -25))
 
             // add gravity
             scene.gravity = new BABYLON.Vector3(0, -9.81, 0)
@@ -282,7 +291,7 @@
         }  
 
         function makeBox(i) {
-            let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2}, scene)
+            let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2})
             box.position._x = (box.position._x * i) + 5
             box.position._z = (box.position._z * i) + 5
 
@@ -294,7 +303,7 @@
             box.material = material
 
             // gravity
-            box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 }, scene)
+            box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 })
             return box
         }
 
@@ -302,7 +311,7 @@
             let walls = []
             for (let i = 0; i < 4; i++) {
                 // constructor
-                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 15, depth: 10, subdivsions: 1})
+                let wall = BABYLON.MeshBuilder.CreatePlane(`wall${i}`, {width: 100, height: 50, depth: 10, subdivsions: 1})
                 // collisions
                 wall.checkCollisions = true
                 // material
@@ -310,7 +319,7 @@
                 wall.material.emissiveColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
                 wall.material.diffuseColor = new BABYLON.Color3(Math.random(), Math.random(), Math.random())
                 // positioning
-                wall.position.y = -2
+                wall.position.y = 2
                 switch (i) {
                     case 0: wall.position.z = 50
                         break
