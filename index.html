@@ -5,6 +5,16 @@
     Instructor: Anu Gupta
     Section: M01
     Lab: 7
+
+    Notes: I am using local textures, inside the /img directory.
+
+    Movement Controls:
+        Forward: W
+        Back: S
+        Right: D
+        Left: A
+        Jump: Space
+        Pan Camera: Mouse, cursor and buttons
 -->
 <html>
     <head>
@@ -106,16 +116,12 @@
 
             // boxes
             const box = makeBox(1)
-            /*
-
-            something's wrong here
 
             let boxes = []
-            let num = 25
+            let num = 88
             for (let i = 0; i < num; i++) {
-                boxes.push(makeBox(i))
+                boxes.push(makeBox(i, num))
             }
-            */
 
             // This targets the camera to player
             camera.setTarget(player)
@@ -299,7 +305,7 @@
             return ground
         }  
 
-        function makeBox(i) {
+        function makeBox(i, total) {
             let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2})
             box.position._x = (box.position._x * i) + 5
             box.position._z = (box.position._z * i) + 5
@@ -311,6 +317,11 @@
             box.material = material
             // gravity
             box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 })
+            // position box
+            let max = (total / 2) > i ? 45 : 3
+            let min = (total / 2) > i ? 3 : -45
+            box.position.x = Math.random() * (max - min) - min
+            box.position.z = Math.random() * (max - min) - min
             return box
         }
 
