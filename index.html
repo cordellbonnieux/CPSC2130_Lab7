@@ -167,10 +167,10 @@
                 }
                 if (controls.shift) {
                     // ram animation
-                    addRamAnimation(player)
-                    console.log(player.animations[0])
+                    //addRamAnimation(player)
+                    //console.log(player)
                     // check if animation started and make it a condition above
-                    scene.beginAnimation(player, 0, 10 * player.frameRate)
+                    //scene.beginAnimation(player, 0, 10 * player.frameRate)
                 }
                 if (controls.a) { 
                     // move left
@@ -350,6 +350,51 @@
             mesh.animations.push(ram)
         }
 
+        function addJumpAnimation(mesh) {
+            const frameRate = 210
+
+            let ram = new BABYLON.Animation('ram', 'position.y', frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE)
+            ram.enableBlending = true
+            ram.blendingSpeed = 0.01
+
+            const keyFrames = [
+                {
+                    frame: 0,
+                    value: 0
+                },
+                {
+                    frame: frameRate,
+                    value: 5
+                },
+                {
+                    frame: 2 * frameRate,
+                    value: 10
+                },
+                {
+                    frame: 3 * frameRate,
+                    value: 15
+                },
+                {
+                    frame: 4 * frameRate,
+                    value: 10
+                },
+                {
+                    frame: 5 * frameRate,
+                    value: 5
+                },
+                {
+                    frame: 6 * frameRate,
+                    value: 0
+                }
+            ]
+
+            ram.setKeys(keyFrames)
+
+            mesh.frameRate = frameRate
+            mesh.animations = []
+            mesh.animations.push(ram)
+        }
+
         // make the ground so player does not fall through the floor!
         function makeGround() {
             // create ground and set y pos
@@ -371,8 +416,8 @@
 
         function makeBox(i, total) {
             let box = BABYLON.MeshBuilder.CreateBox(`box${i}`, {width: 2, height: 2, depth: 2})
-            box.position._x = (box.position._x * i) + 5
-            box.position._z = (box.position._z * i) + 5
+            //box.position._x = (box.position._x * i) + 5
+            //box.position._z = (box.position._z * i) + 5
             // material
             let material = new BABYLON.StandardMaterial(scene)
             material.alpha = 1
@@ -381,12 +426,17 @@
             box.material = material
             // gravity
             box.impostor = new BABYLON.PhysicsImpostor(box, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 1, friction: 0.0, restitution: 0 })
-            // position box
-            let max = (total / 2) > i ? 45 : 3
-            let min = (total / 2) > i ? 3 : -45
+            // position box - negative values were giving unexpected results
+            let max = 30//(total / 2) > i ? 30 : 3
+            let min = 3//(total / 2) > i ? 3 : -30
             box.position.x = Math.random() * (max - min) - min
             box.position.z = Math.random() * (max - min) - min
+            box.position.y = 2
             return box
+        }
+
+        makeDisc() {
+            let disc;
         }
 
         function makeWalls() {
