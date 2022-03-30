@@ -106,7 +106,7 @@
             scene.gravity = new BABYLON.Vector3(0, -9.81, 0)
 
             // player
-            const player = makePlayer()
+            let player = makePlayer()
 
             // ground 
             const ground = makeGround()
@@ -155,35 +155,46 @@
                 
                 isPlayerInside(player)
 
+                rotatePlayer(player, camera)
+
+                scene.beginAnimation(player, 0, 10 * player.frameRate, true)
+
                 if (controls.space && player.grounded) {
                     // jump
                     player.grounded = false
                     const up = new BABYLON.Vector3(player.position._x, player.position._y + 1, player.position._z)
                     player.impostor.applyImpulse(new BABYLON.Vector3(0, 100, 0), up)
                 }
+                if (controls.shift) {
+                    // ram animation
+                    addRamAnimation(player)
+                    console.log(player.animations[0])
+                    // check if animation started and make it a condition above
+                    scene.beginAnimation(player, 0, 10 * player.frameRate)
+                }
                 if (controls.a) { 
                     // move left
                     const left = new BABYLON.Vector3(player.position._x + 1, player.position._y, player.position._z)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(-1, 0, 0), left)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(-2, 0, 0), left)
                     //player.moveWithCollisions(new BABYLON.Vector3(-1, 0, 0))
                 }
                 if (controls.d) {
                     // move right
                     const right = new BABYLON.Vector3(player.position._x - 1, player.position._y, player.position._z)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(1, 0, 0), right)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(2, 0, 0), right)
                     //player.moveWithCollisions(new BABYLON.Vector3(1, 0, 0))
                 }
                 if (controls.w) {
                     // move forward
                     //player.moveWithCollisions(new BABYLON.Vector3(0, 0, 1))
                     const forward = new BABYLON.Vector3(player.position._x, player.position._y, player.position._z - 1)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, 1), forward)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, 2), forward)
                 }
                 if (controls.s) {
                     // move backward
                     //player.moveWithCollisions(new BABYLON.Vector3(0, 0, -1))
                     const forward = new BABYLON.Vector3(player.position._x, player.position._y, player.position._z + 1)
-                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, -1), forward)
+                    player.impostor.applyImpulse(new BABYLON.Vector3(0, 0, -2), forward)
                 }
             })
 
@@ -222,7 +233,8 @@
                 w: false,
                 a: false,
                 s: false,
-                d: false
+                d: false,
+                shift: false
             }
 
             document.addEventListener('keydown', (e) => {
@@ -247,6 +259,10 @@
                     controls.space = true
                     key = 'space'
                 }
+                if (e.keyCode == 16) {
+                    controls.shift = true
+                    key = 'shift'
+                }
                 key = key == null ? 'unassigned key' : key
                 text.text = `key pressed: ${key}`
             })
@@ -267,7 +283,10 @@
                 }
                 if (e.keyCode == 32) {
                     controls.space = false
-                }           
+                }
+                if (e.keyCode == 16) {
+                    controls.shift = false
+                }     
             })
             return controls
         }
@@ -277,7 +296,7 @@
             let player = BABYLON.MeshBuilder.CreateSphere("player", {}, scene);
             // material
             let playerMaterial = new BABYLON.StandardMaterial(scene)
-            playerMaterial.alpha = 0.8
+            playerMaterial.alpha = 1
             playerMaterial.diffuseColor = new BABYLON.Color3(1.0, 0.2, 0.7)
             player.material = playerMaterial
             player.checkCollisions = true
@@ -288,6 +307,47 @@
             // gravity
             player.impostor = new BABYLON.PhysicsImpostor(player, BABYLON.PhysicsImpostor.BoxImpostor, { mass: 10, friction: 0.5, restitution: 0.3 }, scene);
             return player
+        }
+
+        function addRamAnimation(mesh) {
+            const frameRate = 30
+
+            let ram = new BABYLON.Animation('ram', 'position.z', frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT)
+            ram.enableBlending = true
+            ram.blendingSpeed = 0.01
+
+            const keyFrames = [
+                {
+                    frame: 0,
+                    value: -10
+                },
+                {
+                    frame: frameRate,
+                    value: 0
+                },
+                {
+                    frame: 2 * frameRate,
+                    value: 10
+                },
+                {
+                    frame: 3 * frameRate,
+                    value: 20
+                },
+                {
+                    frame: 4 * frameRate,
+                    value: 10
+                },
+                {
+                    frame: 5 * frameRate,
+                    value: 0
+                }
+            ]
+
+            ram.setKeys(keyFrames)
+
+            mesh.frameRate = frameRate
+            mesh.animations = []
+            mesh.animations.push(ram)
         }
 
         // make the ground so player does not fall through the floor!
@@ -366,6 +426,12 @@
                 p.position.y = 0
                 p.position.z = 0
             }
+        }
+
+        function rotatePlayer(p, c) {
+            p.rotation.x = c.rotation.x
+            p.rotation.y = c.rotation.y
+            p.rotation.z = c.rotation.z
         }
     </script>
 </body>
