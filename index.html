@@ -14,6 +14,7 @@
         Right: D
         Left: A
         Jump: Space
+        Start Animations: Shift
         Pan Camera: Mouse, cursor and buttons
 -->
 <html>
@@ -121,9 +122,20 @@
                 boxes.push(makeBox(i, num))
             }
 
-            // disc
+            // disc - with jump animation
             let disc = makeDisc(scene)
-            addJumpAnimation(disc)
+            disc.frameRate = 210
+            disc.animations.push(addJumpAnimation(disc.frameRate))
+            
+
+            // disc - with ram animation
+            let disc2 = makeDisc(scene)
+            disc2.frameRate = 180
+            disc2.position.x = -15
+            disc2.animations.push(addRamAnimation(disc2.frameRate))
+            
+
+            // disc 2
 
             // This targets the camera to player
             camera.setTarget(player)
@@ -144,7 +156,7 @@
             // input listeners
             const controls = addControls(text)
 
-            // preload
+            // delta
             scene.registerBeforeRender(() => {
                 if (!scene.isReady()) {
                     return
@@ -159,21 +171,17 @@
 
                 rotatePlayer(player, camera)
 
-                scene.beginAnimation(player, 0, 10 * player.frameRate, true)
-
                 if (controls.space && player.grounded) {
                     // jump
                     player.grounded = false
                     const up = new BABYLON.Vector3(player.position._x, player.position._y + 1, player.position._z)
                     player.impostor.applyImpulse(new BABYLON.Vector3(0, 100, 0), up)
                 }
-                if (controls.shift) {
-                    // ram animation does not work on imposter body,
-                    // something to maybe revisit
-                    //addRamAnimation(player)
-                    //console.log(player)
-                    // check if animation started and make it a condition above
-                    //scene.beginAnimation(player, 0, 10 * player.frameRate)
+                if (controls.shift && !controls.animationStarted) {
+                    // start animations
+                    scene.beginAnimation(disc, 0, 10 * disc.frameRate, true)
+                    scene.beginAnimation(disc2, 0, 10 * disc2.frameRate, true)
+                    controls.animationStarted = true
                 }
                 if (controls.a) { 
                     // move left
@@ -237,7 +245,8 @@
                 a: false,
                 s: false,
                 d: false,
-                shift: false
+                shift: false,
+                animationStarted: false
             }
 
             document.addEventListener('keydown', (e) => {
@@ -313,8 +322,7 @@
         }
 
         // unused animation
-        function addRamAnimation(mesh) {
-            const frameRate = 30
+        function addRamAnimation(frameRate) {
 
             let ram = new BABYLON.Animation('ram', 'position.z', frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT)
             ram.enableBlending = true
@@ -348,19 +356,14 @@
             ]
 
             ram.setKeys(keyFrames)
-
-            mesh.frameRate = frameRate
-            mesh.animations = []
-            mesh.animations.push(ram)
+            return ram
         }
 
         // animation used on the disc object
-        function addJumpAnimation(mesh) {
-            const frameRate = 210
-
-            let ram = new BABYLON.Animation('ram', 'position.y', frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE)
-            ram.enableBlending = true
-            ram.blendingSpeed = 0.01
+        function addJumpAnimation(frameRate) {
+            let j = new BABYLON.Animation('jump', 'position.y', frameRate, BABYLON.Animation.ANIMATIONTYPE_FLOAT, BABYLON.Animation.ANIMATIONLOOPMODE_CYCLE)
+            j.enableBlending = true
+            j.blendingSpeed = 0.01
 
             const keyFrames = [
                 {
@@ -393,11 +396,9 @@
                 }
             ]
 
-            ram.setKeys(keyFrames)
+            j.setKeys(keyFrames)
 
-            mesh.frameRate = frameRate
-            mesh.animations = []
-            mesh.animations.push(ram)
+            return j
         }
 
         // make the ground so player does not fall through the floor!
